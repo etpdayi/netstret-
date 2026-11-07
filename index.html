@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>netsret</title>
+<style>
+:root{--bg:#fff1c9;--ink:#17141f;--mut:#6b6577;--y:#ffd23f;--p:#ff5c93;--b:#4d7cff;--g:#2ed39b;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg) radial-gradient(#e6c97c 1.2px,transparent 1.3px) 0 0/18px 18px;color:var(--ink);font:16px/1.5 "Trebuchet MS","Segoe UI",system-ui,sans-serif}
+main{max-width:1080px;margin:0 auto;padding:24px 16px 56px}
+.logo{font-size:clamp(3rem,12vw,4.6rem);font-weight:900;letter-spacing:-.04em;line-height:1;margin:0;text-shadow:4px 4px 0 var(--p)}
+.logo i{display:block;font-style:normal;transform:scaleY(-1);opacity:.16;height:.5em;overflow:hidden;margin-top:-.1em;text-shadow:none}
+.sub{color:var(--mut);margin:10px 0 18px}
+.card{background:#fff;border:3px solid var(--ink);border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:5px 5px 0 var(--ink)}
+h2{font-size:1.25rem;font-weight:900;margin:0 0 10px}
+.eb{font:800 .7rem/1 ui-monospace,Consolas,monospace;letter-spacing:.2em;color:var(--p);margin:0 0 8px}
+button{font:inherit;font-weight:800;border:3px solid var(--ink);border-radius:12px;padding:10px 16px;margin:4px 8px 4px 0;background:var(--y);color:var(--ink);cursor:pointer;box-shadow:3px 3px 0 var(--ink)}
+button:active:not(:disabled){transform:translate(3px,3px);box-shadow:none}
+button:disabled{opacity:.45;box-shadow:none;cursor:default}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px dashed var(--ink);outline-offset:3px}
+button.g{background:#fff}button.b{background:var(--b);color:#fff}button.gr{background:var(--g)}
+input,select{font:inherit;width:100%;padding:12px 14px;border:3px solid var(--ink);border-radius:12px;background:#fff;color:var(--ink);margin-bottom:10px}
+label{display:block;font-weight:800;font-size:.85rem;margin:8px 0 6px}
+.mono{font-family:ui-monospace,Consolas,monospace;letter-spacing:.3em;text-transform:uppercase;text-align:center;font-size:1.2rem}
+.code{display:inline-block;font-weight:900;font-size:2.4rem;letter-spacing:.2em;background:var(--y);border:3px solid var(--ink);border-radius:12px;padding:2px 14px;box-shadow:4px 4px 0 var(--ink)}
+.tabs{display:flex;border:3px solid var(--ink);border-radius:14px;overflow:hidden;margin:12px 0 14px;background:#fff}
+.tabs button{flex:1;margin:0;border:0;border-radius:0;box-shadow:none;background:#fff}
+.tabs button+button{border-left:3px solid var(--ink)}
+.tabs button.on{background:var(--ink);color:#fff}
+.hm{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:24px;align-items:start}
+.entry{position:sticky;top:12px}
+.hh{font-size:1.7rem;line-height:1.2;margin-bottom:12px}
+.stp{display:flex;gap:12px;padding:10px 0;border-top:2px dashed #cfc7b4}
+.stp:first-of-type{border-top:0;padding-top:0}
+.stp p{margin:0}.stp b{display:block}
+.n{width:34px;height:34px;border-radius:50%;background:var(--y);border:3px solid var(--ink);font-weight:900;display:flex;align-items:center;justify-content:center;flex:none}
+.info p{margin:0 0 8px}
+.gm{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:16px;align-items:start}
+.pn{position:sticky;top:12px}
+.ph{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.ph h2 small{color:var(--mut);font-weight:700}
+.kt{font:700 .75rem ui-monospace,Consolas,monospace;color:var(--mut)}
+.pl{display:flex;align-items:center;gap:10px;padding:8px;border:3px solid var(--ink);border-radius:12px;margin-bottom:8px;background:#fff}
+.pl.nr{background:#ffe3ec}
+.rk{font:700 .7rem ui-monospace,Consolas,monospace;color:var(--mut)}
+.av{width:38px;height:38px;border-radius:50%;background:var(--b);color:#fff;border:3px solid var(--ink);display:flex;align-items:center;justify-content:center;font-weight:900;flex:none}
+.av.mc{background:var(--p)}
+.pi{flex:1;min-width:0;line-height:1.25}.pi b{overflow-wrap:anywhere}.pi small{display:block;color:var(--mut);font-weight:600}
+.you{font:800 .6rem/1 ui-monospace,Consolas,monospace;background:var(--ink);color:#fff;padding:3px 6px;border-radius:5px;margin-left:4px}
+.sc{font-size:1.3rem}
+.ov{position:fixed;inset:0;background:rgba(23,20,31,.72);display:flex;align-items:center;justify-content:center;padding:16px;z-index:9;overflow:auto}
+.md{position:relative;background:#fff;border:3px solid var(--ink);border-radius:16px;padding:20px;max-width:480px;width:100%;box-shadow:6px 6px 0 var(--ink)}
+.x{position:absolute;top:12px;right:12px;margin:0;padding:4px 12px;background:#fff}
+.rp{border:3px solid var(--ink);border-radius:14px;padding:14px;margin-bottom:12px;background:#fffdf4}
+.rh{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.pill{font:800 .7rem/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;padding:5px 10px;border:2px solid var(--ink);border-radius:999px;background:#fff}
+.pill.r{background:var(--p);color:#fff}.pill.a{background:var(--b);color:#fff}.pill.y{background:var(--y)}
+.tm{font:700 .95rem ui-monospace,Consolas,monospace}
+.rt{font-weight:900}.rs{color:var(--mut);font-size:.9rem}
+.eq{display:flex;align-items:flex-end;gap:3px;height:46px;margin:12px 0 8px}
+.eq i{flex:1;background:var(--ink);border-radius:2px;height:8%;min-height:3px;transition:height .08s}
+.pg{height:10px;border:2px solid var(--ink);border-radius:99px;overflow:hidden;background:#fff}
+.pg b{display:block;height:100%;width:0;background:var(--p)}
+.wf{display:flex;align-items:center;gap:3px;height:56px;margin-top:12px}
+.wf i{flex:1;background:var(--ink);border-radius:3px;min-height:3px}
+.wf i.on{background:var(--p)}
+.rb{text-align:center}
+.rbtn{width:76px;height:76px;border-radius:50%;padding:0;margin:8px auto 2px;display:flex;align-items:center;justify-content:center;background:var(--p)}
+.rbtn i{width:26px;height:26px;border-radius:50%;background:#fff;border:3px solid var(--ink)}
+.rbtn.stop i{border-radius:6px;background:var(--ink);border-color:#fff}
+.rbtn.stop{animation:pu 1.1s infinite}
+@keyframes pu{50%{box-shadow:0 0 0 10px rgba(255,92,147,.35),3px 3px 0 var(--ink)}}
+.lbl{text-align:center;font-weight:800;font-size:.85rem}
+.okb{background:var(--g);border:3px solid var(--ink);border-radius:12px;padding:10px 12px;font-weight:700;margin-top:10px}
+.top{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.top .card{margin:0}
+.wc{text-align:center;transition:background .15s}
+.wd{font-size:clamp(1.8rem,5vw,2.8rem);font-weight:900;letter-spacing:-.02em;margin:6px 0 12px;overflow-wrap:anywhere}
+.chip{display:inline-block;border:3px solid var(--ink);border-radius:999px;padding:4px 12px;font-size:.85rem;background:#fff}
+.rg{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-bottom:16px}
+.rc{display:flex;align-items:center;gap:10px;padding:10px;border:3px solid var(--ink);border-radius:12px;background:#fff;transition:background .15s,transform .15s}
+.rc.yes{background:#c8f7e3}.rc.no{background:#ffd9e5}
+.ri{flex:1;min-width:0;line-height:1.25}.ri small{display:block;color:var(--mut);font-style:italic;overflow-wrap:anywhere}
+.rs2{text-align:right;font-size:.8rem;line-height:1.25}.rs2 em{display:block;font-style:normal;font-weight:900}.rs2 b{display:block}
+.act{background:var(--y)!important}.rc.act{transform:scale(1.03)}
+.winner{font-size:1.6rem;font-weight:900}
+#msg{color:#c0245a;min-height:1.4em;font-weight:800}
+@media (max-width:860px){.hm,.gm{grid-template-columns:1fr}.entry{order:-1;position:static}.pn{position:static}}
+@media (max-width:640px){.top{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+<h1 class="logo" id="logo">netsret<i aria-hidden="true">netsret</i></h1>
+<p class="sub">Tersten duy, taklit et, kelimeyi bul.</p>
+<div id="msg" role="alert"></div>
+<div id="app"></div>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
+<script>window.Peer||document.write('<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"><\/script>')</script>
+<script>
+var ctx=null,peer=null,isHost=false,conns={},hostConn=null,me="",code="",name="",cur=null,SR=null;
+var S={players:[],order:[],idx:0,phase:"lobby",word:"",raw:null,got:{},st:{}};
+var V={},myRaw=null,myBuf=null,micId="";
+try{micId=localStorage.getItem("netsretMic")||""}catch(e){}
+function $(i){return document.getElementById(i)}
+function msg(t){$("msg").textContent=t||""}
+function ui(h){$("app").innerHTML=h}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function norm(t){return String(t).trim().toLocaleLowerCase("tr")}
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms)})}
+
+/* ---------- ses ---------- */
+function ac(){if(!ctx)ctx=new(window.AudioContext||window.webkitAudioContext)();if(ctx.state==="suspended")ctx.resume();return ctx}
+function trim(b){
+  var d=b.getChannelData(0),pk=0,i;
+  for(i=0;i<d.length;i++)pk=Math.max(pk,Math.abs(d[i]));
+  var th=Math.max(0.006,pk*0.03),s=0,e=d.length-1;
+  while(s<e&&Math.abs(d[s])<th)s++;
+  while(e>s&&Math.abs(d[e])<th)e--;
+  var pad=Math.floor(b.sampleRate*0.08);
+  s=Math.max(0,s-pad);e=Math.min(d.length-1,e+pad);
+  var g=pk>0.01?Math.min(8,0.9/pk):1,o=ac().createBuffer(b.numberOfChannels,e-s+1,b.sampleRate);
+  for(var c=0;c<b.numberOfChannels;c++){
+    var src=b.getChannelData(c),dst=o.getChannelData(c);
+    for(i=0;i<dst.length;i++)dst[i]=src[s+i]*g;
+  }
+  return o;
+}
+function rev(b){
+  var o=ac().createBuffer(b.numberOfChannels,b.length,b.sampleRate);
+  for(var c=0;c<b.numberOfChannels;c++){var s=b.getChannelData(c),d=o.getChannelData(c),n=s.length;for(var i=0;i<n;i++)d[i]=s[n-1-i]}
+  return o;
+}
+function stopAll(){if(cur){try{cur.stop()}catch(e){}cur=null}}
+function play(b,done){
+  stopAll();
+  var c=ac(),s=c.createBufferSource(),g=c.createGain(),t=c.currentTime+.03,f=.02;
+  s.buffer=b;s.connect(g);g.connect(c.destination);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(1,t+f);
+  g.gain.setValueAtTime(1,Math.max(t+f,t+b.duration-f));g.gain.linearRampToValueAtTime(0,t+b.duration);
+  s.onended=function(){if(cur===s)cur=null;if(done)done()};
+  cur=s;s.start(t);
+}
+function toAB(raw){var u=new Uint8Array(raw);return u.buffer.slice(u.byteOffset,u.byteOffset+u.byteLength)}
+function load(raw){return ac().decodeAudioData(toAB(raw)).then(trim)}
+function mic(){
+  var c={echoCancellation:false,noiseSuppression:false,autoGainControl:false};
+  if(micId)c.deviceId={exact:micId};
+  return navigator.mediaDevices.getUserMedia({audio:c}).catch(function(e){
+    if(micId){micId="";return navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}})}
+    throw e;
+  });
+}
+function fmt(ms){var t=Math.floor(ms/100)/10,m=Math.floor(t/60),s=(t-m*60).toFixed(1);return(m<10?"0":"")+m+":"+(s<10?"0":"")+s}
+function eqpg(){return '<div class="eq">'+new Array(25).join('<i></i>')+'</div><div class="pg"><b></b></div>'}
+function tick(box,ms,l,max){
+  var a=box.querySelector(".tm"),p=box.querySelector(".pg b"),e=box.querySelectorAll(".eq i");
+  if(a)a.textContent=fmt(ms);
+  if(p)p.style.width=Math.min(100,ms/(max*10))+"%";
+  var h=box._h||(box._h=[]);h.push(l);if(h.length>e.length)h.shift();
+  var off=e.length-h.length;
+  e.forEach(function(x,i){x.style.height=Math.max(8,(h[i-off]||0)*10)+"%"});
+}
+function bars(buf,n){
+  var d=buf.getChannelData(0),step=Math.floor(d.length/n)||1,o=[],mx=0.001;
+  for(var i=0;i<n;i++){var s=0;for(var j=0;j<step;j++)s=Math.max(s,Math.abs(d[i*step+j]||0));o.push(s);mx=Math.max(mx,s)}
+  return o.map(function(v){return Math.max(.08,v/mx)});
+}
+function wfHtml(buf){return bars(buf,48).map(function(v){return '<i style="height:'+Math.round(v*100)+'%"></i>'}).join("")}
+function capture(o){
+  var c={},mr,stream,an,src,raf,t0,chunks=[];
+  c.start=async function(){
+    try{ac();stream=await mic()}
+    catch(e){msg("Mikrofon izni alınamadı. Tarayıcı ayarlarından izin ver.");o.onFail();return}
+    chunks=[];
+    an=ac().createAnalyser();an.fftSize=512;src=ac().createMediaStreamSource(stream);src.connect(an);
+    var d=new Uint8Array(an.fftSize);
+    try{mr=new MediaRecorder(stream,{audioBitsPerSecond:64000})}catch(e){mr=new MediaRecorder(stream)}
+    mr.ondataavailable=function(e){chunks.push(e.data)};
+    mr.onstop=async function(){
+      cancelAnimationFrame(raf);stream.getTracks().forEach(function(t){t.stop()});src.disconnect();
+      if(!o.alive())return;
+      try{
+        var raw=await new Blob(chunks).arrayBuffer();
+        var b=trim(await ac().decodeAudioData(raw.slice(0)));
+        if(b.duration<0.25){msg("Ses çok kısa, tekrar dene.");o.onFail();return}
+        msg();o.onDone(raw,b);
+      }catch(e){msg("Ses çözülemedi, tekrar kaydet.");o.onFail()}
+    };
+    mr.start();t0=performance.now();msg();o.onStart();
+    (function loop(){
+      if(!o.alive()){c.stop();return}
+      an.getByteTimeDomainData(d);var p=0;
+      for(var i=0;i<d.length;i++)p=Math.max(p,Math.abs(d[i]-128));
+      var ms=performance.now()-t0;o.onTick(ms,Math.min(10,Math.round(p/128*20)));
+      if(ms>=o.max*1000){c.stop();return}
+      raf=requestAnimationFrame(loop);
+    })();
+  };
+  c.stop=function(){if(mr&&mr.state==="recording")mr.stop()};
+  return c;
+}
+function recUI(box,o){
+  var max=o.max||8,cap,raw,buf;
+  function alive(){return box.isConnected}
+  function ev(s){if(o.onState)o.onState(s)}
+  function ready(){box.innerHTML='<div class="rp"><div class="rh"><span class="pill">HAZIR</span><b class="tm">00:00.0</b></div><div class="rt">'+esc(o.title)+'</div><div class="rs">'+esc(o.hint)+' (en fazla '+max+' sn)</div>'+eqpg()+'</div><div class="rb"><button class="rbtn" data-r="s" aria-label="Kaydı başlat"><i></i></button><div class="lbl">Kaydet</div></div>'}
+  function recording(){box.innerHTML='<div class="rp"><div class="rh"><span class="pill r">● KAYIT</span><b class="tm">00:00.0</b></div><div class="rt">Şimdi söyle!</div><div class="rs">'+esc(o.hint)+'</div>'+eqpg()+'</div><div class="rb"><button class="rbtn stop" data-r="e" aria-label="Kaydı bitir"><i></i></button><div class="lbl">Bitir</div></div>';ev("rec")}
+  function preview(){
+    box.innerHTML='<div class="rp"><div class="rh"><span class="pill a">ÖNİZLEME</span><b class="tm">'+fmt(buf.duration*1000)+'</b></div><div class="rt">Kaydın hazır</div><div class="rs">Dinle, beğenmezsen yeniden kaydet.</div><div class="wf">'+wfHtml(buf)+'</div>'+(o.note?'<div class="okb">'+esc(o.note)+'</div>':'')+'</div><div class="rb"><button class="b" data-r="p">Dinle</button>'+
+      (o.extras||[]).map(function(x,i){return '<button class="b" data-r="x'+i+'">'+esc(x.label)+'</button>'}).join("")+
+      '<button class="g" data-r="s">Tekrar Kaydet</button>'+(o.confirm?'<button class="gr" data-r="c">'+esc(o.confirm.label)+'</button>':'')+'</div>';
+  }
+  box.onclick=function(e){
+    var b=e.target.closest("[data-r]");if(!b)return;var k=b.dataset.r;
+    if(k==="s"){
+      b.disabled=true;stopAll();
+      cap=capture({max:max,alive:alive,onStart:recording,onTick:function(ms,l){tick(box,ms,l,max)},onDone:function(r,bf){raw=r;buf=bf;preview();if(o.onReady)o.onReady(r,bf);ev("pre")},onFail:function(){ready();ev("idle")}});
+      cap.start();
+    }else if(k==="e"){if(cap)cap.stop()}
+    else if(k==="p"){play(buf)}
+    else if(k==="c"){o.confirm.fn(raw,buf)}
+    else if(k[0]==="x"){var x=o.extras[+k.slice(1)];play(x.rev?rev(buf):buf)}
+  };
+  ready();
+}
+function closeT(){stopAll();var o=$("ov");if(o)o.remove()}
+async function loadDevs(){
+  var s=$("dev");
+  try{
+    var st=await navigator.mediaDevices.getUserMedia({audio:true});st.getTracks().forEach(function(t){t.stop()});
+    var ds=(await navigator.mediaDevices.enumerateDevices()).filter(function(d){return d.kind==="audioinput"});
+    if(!$("dev"))return;
+    s.innerHTML=ds.map(function(d){return '<option value="'+esc(d.deviceId)+'">'+esc(d.label||"Mikrofon")+'</option>'}).join("");
+    if(micId&&ds.some(function(d){return d.deviceId===micId}))s.value=micId;else micId=s.value;
+  }catch(e){if($("dev"))s.innerHTML='<option>Mikrofon izni gerekli</option>';msg("Mikrofon izni alınamadı. Tarayıcı ayarlarından izin ver.")}
+}
+function showTest(){
+  closeT();var d=document.createElement("div");d.id="ov";d.className="ov";
+  d.innerHTML='<div class="md" role="dialog" aria-modal="true" aria-label="Mikrofon kontrolü"><button class="x g" data-a="closeT" aria-label="Kapat">×</button><p class="eb">MİKROFON KONTROLÜ</p><h2>Sesini dene</h2><p class="sub">Oyuna başlamadan önce mikrofonunu seç, bir şey söyle ve tersten nasıl çıktığını dinle.</p><label for="dev">Mikrofon</label><select id="dev"></select><div id="tb"></div></div>';
+  document.body.appendChild(d);
+  $("dev").onchange=function(){micId=this.value;try{localStorage.setItem("netsretMic",micId)}catch(e){}};
+  loadDevs();
+  recUI($("tb"),{title:"Bir şey söyle",hint:"Örn: “Tarkan” ya da “Merhaba”",max:8,extras:[{label:"Tersten Dinle",rev:true}],note:"Mikrofon çalışıyor! Düz ve ters halini dinleyebilirsin."});
+}
+
+/* ---------- ağ ---------- */
+function rc(){var a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",s="";for(var i=0;i<6;i++)s+=a[Math.floor(Math.random()*a.length)];return s}
+function nm(){var n=$("nm").value.trim();if(!n)msg("Önce takma adını yaz.");return n}
+var INFO='<div class="card"><p class="eb">ÇOK OYUNCULU SESLİ PARTİ OYUNU</p><h2 class="hh">Tersten duyduğunu söyle, kelimeyi bul.</h2><p>netsret, 3–10 kişilik arkadaş gruplarıyla tarayıcıdan oynanan bir ses oyunudur. Anlatıcının gizli kelimesi tersine çevrilip herkese çalınır. Oyuncular duydukları garip sesi taklit eder; taklit yeniden tersine çevrilince kelime geri belirir. Hesap ya da kurulum gerekmez.</p></div>'+
+'<div class="card"><h2>Nasıl oynanır?</h2>'+
+[["Oda aç, arkadaşlarını çağır","Bir kişi oda açar ve 6 haneli kodu paylaşır. Diğerleri bu kodla katılır."],
+["Anlatıcı kelimeyi kaydeder","Sırası gelen oyuncu gizli bir kelime ya da cümle yazar ve sesli söyleyerek kaydeder. Herkes sırayla anlatıcı olur."],
+["Ters sesi taklit et","Diğer oyuncular kaydın tersten halini dinler. Duydukları garip sesi olduğu gibi taklit edip kaydeder."],
+["Kendi sesini çöz","Taklit yeniden tersine çevrilir ve kayıt sahibine çalınır. Orijinale yaklaşan sesi dinleyip kelimeyi yazarak tahmin eder."],
+["Sahne senin","Tur sonunda herkesin tersten duyduğu ses sırayla çalınır, tahminler açıklanır ve puanlar dağıtılır. Sonra sıradaki anlatıcıyla devam edilir."]].map(function(x,i){return '<div class="stp"><span class="n">'+(i+1)+'</span><p><b>'+x[0]+'</b>'+x[1]+'</p></div>'}).join("")+'</div>'+
+'<div class="card"><h2>Puanlama</h2><p>Doğru tahmin eden oyuncu 1 puan alır. Anlatıcı, kelimeyi bilen oyuncu sayısı kadar puan kazanır. Büyük/küçük harf fark etmez, ama yazım birebir aynı olmalıdır.</p></div>'+
+'<div class="card"><h2>Başlamadan önce</h2><p>Mikrofonlu bir bilgisayar ve masaüstü tarayıcı (Chrome, Edge veya Firefox) yeterli. Kulaklık kullanırsan ses daha temiz kaydedilir. Başlamadan “Mikrofonu Dene” ile sesini kontrol et.</p></div>';
+function home(mode){
+  var n=$("nm")?$("nm").value:"";msg();
+  ui('<div class="hm"><div class="info">'+INFO+'</div><div class="card entry"><p class="eb">HOŞ GELDİN</p><h2>'+(mode==="join"?'Odaya Katıl':'Oda Aç')+'</h2>'+
+    '<div class="tabs"><button data-a="tab" data-m="host" class="'+(mode==="join"?'':'on')+'">Oda Aç</button><button data-a="tab" data-m="join" class="'+(mode==="join"?'on':'')+'">Koda Katıl</button></div>'+
+    '<label for="nm">Takma Adın</label><input id="nm" maxlength="16" autocomplete="off">'+
+    (mode==="join"?'<label for="code">Oda Kodu</label><input id="code" class="mono" placeholder="ABC123" maxlength="6" autocomplete="off"><button data-a="join">Odaya Gir</button>':'<button data-a="host">Odayı Aç</button>')+'<button class="g" data-a="test">Mikrofonu Dene</button></div></div>');
+  $("nm").value=n;
+}
+function wd(){var p=peer;setTimeout(function(){if(p===peer&&!p.open&&!p.destroyed)msg("Sinyalleşme sunucusuna bağlanılamadı. Sayfayı önizlemede değil, kendi tarayıcında (GitHub Pages veya yerel dosya) aç.")},8000)}
+function host(){
+  name=nm();if(!name)return;
+  if(!window.Peer){msg("PeerJS yüklenemedi. İnternet bağlantını kontrol edip sayfayı yenile.");return}
+  if(peer)peer.destroy();
+  code=rc();peer=new Peer("netsret-"+code);wd();
+  peer.on("error",function(e){if(e.type==="unavailable-id")host();else msg("Bağlantı hatası: "+e.type)});
+  peer.on("open",function(id){
+    me=id;isHost=true;S={players:[{id:me,name:name,score:0}],order:[],idx:0,phase:"lobby",word:"",raw:null,got:{},st:{}};
+    peer.on("connection",function(c){
+      c.on("data",function(d){hmsg(c.peer,d,c)});
+      c.on("close",function(){drop(c.peer)});
+    });
+    bc({t:"lobby"});
+  });
+}
+function join(){
+  name=nm();var c=$("code").value.trim().toUpperCase();
+  if(!name||!c){if(name)msg("Oda kodunu yaz.");return}
+  if(!window.Peer){msg("PeerJS yüklenemedi. İnternet bağlantını kontrol edip sayfayı yenile.");return}
+  if(peer)peer.destroy();
+  code=c;peer=new Peer();wd();
+  peer.on("error",function(e){msg(e.type==="peer-unavailable"?"Oda bulunamadı.":"Bağlantı hatası: "+e.type)});
+  peer.on("open",function(id){
+    me=id;hostConn=peer.connect("netsret-"+c,{reliable:true});
+    hostConn.on("open",function(){hostConn.send({t:"hello",name:name})});
+    hostConn.on("data",cmsg);
+    hostConn.on("close",function(){msg("Kurucunun bağlantısı koptu. Sayfayı yenileyip yeni oda açın.")});
+  });
+}
+function pub(){return{players:S.players,round:S.idx+1,total:S.order.length,narr:S.order[S.idx],st:S.st,ph:S.phase}}
+function bc(m){m.p=pub();for(var k in conns)try{conns[k].send(m)}catch(e){}cmsg(m)}
+function tohost(m){if(isHost)hmsg(me,m);else hostConn.send(m)}
+function drop(id){
+  delete conns[id];
+  var i=S.players.findIndex(function(p){return p.id===id});if(i<0)return;
+  S.players.splice(i,1);
+  if(S.phase==="lobby"){bc({t:"lobby"});return}
+  if(S.players.length<2){S.phase="end";bc({t:"end"});return}
+  var oi=S.order.indexOf(id),wasNarr=oi===S.idx;
+  if(oi>=0)S.order.splice(oi,1);
+  if(oi>=0&&oi<S.idx)S.idx--;
+  if(wasNarr&&S.phase!=="reveal"){if(S.idx>=S.order.length){S.phase="end";bc({t:"end"})}else{S.phase="narr";S.got={};S.st={};bc({t:"narr"})}return}
+  if(S.phase==="guess")chk();
+}
+function chk(){
+  var n=S.order[S.idx];
+  if(Object.keys(S.got).length>=S.players.filter(function(p){return p.id!==n}).length)finish();
+}
+function hmsg(from,d,c){
+  if(d.t==="hello"){
+    if(S.phase!=="lobby"){c.send({t:"err",m:"Oyun çoktan başladı."});return}
+    if(S.players.length>=10){c.send({t:"err",m:"Oda dolu (en fazla 10 kişi)."});return}
+    conns[from]=c;S.players.push({id:from,name:String(d.name).slice(0,16),score:0});bc({t:"lobby"});
+  }else if(d.t==="st"){
+    if((S.phase==="narr"||S.phase==="guess")&&S.st[from]!=="sent"&&S.players.some(function(p){return p.id===from})){S.st[from]=String(d.s);bc({t:"stat"})}
+  }else if(d.t==="orig"&&S.phase==="narr"&&from===S.order[S.idx]){
+    S.word=d.word;S.raw=d.buf;S.phase="guess";S.got={};S.st={};bc({t:"guess",buf:d.buf});
+  }else if(d.t==="guess"&&S.phase==="guess"&&from!==S.order[S.idx]&&!S.got[from]){
+    S.got[from]={guess:String(d.guess),buf:d.buf};S.st[from]="sent";
+    bc({t:"prog",n:Object.keys(S.got).length});chk();
+  }
+}
+function finish(){
+  var n=S.order[S.idx],res=[],c=0;
+  S.players.forEach(function(p){
+    if(p.id===n)return;var g=S.got[p.id];if(!g)return;
+    var ok=norm(g.guess)===norm(S.word);if(ok){p.score++;c++}
+    res.push({name:p.name,guess:g.guess,ok:ok,buf:g.buf});
+  });
+  var N=S.players.find(function(p){return p.id===n});if(N)N.score+=c;
+  S.phase="reveal";S.st={};bc({t:"reveal",word:S.word,orig:S.raw,res:res});
+}
+
+/* ---------- panel ve ekranlar ---------- */
+function ini(n){return esc((String(n).trim()[0]||"?").toLocaleUpperCase("tr"))}
+function nameOf(P,id){var x=P.players.find(function(p){return p.id===id});return x?x.name:"?"}
+function stText(P,p){
+  var ph=P.ph,s=(P.st||{})[p.id],nr=p.id===P.narr;
+  if(ph==="lobby")return p.id===P.players[0].id?"Kurucu":"Hazır";
+  if(ph==="reveal")return "Gösterimi izliyor";
+  if(ph==="end")return "Oyun bitti";
+  if(ph==="narr")return nr?({rec:"Kelimeyi kaydediyor",pre:"Kaydı kontrol ediyor"}[s]||"Kelimesini hazırlıyor"):"Anlatıcıyı bekliyor";
+  return nr?"Tahminleri bekliyor":({rec:"Taklidini kaydediyor",pre:"Tahmin yazıyor",sent:"Gönderdi ✓"}[s]||"Ters sesi dinliyor");
+}
+function panelInner(P){
+  var live=P.ph==="narr"||P.ph==="guess"||P.ph==="reveal";
+  var ps=P.players.map(function(p,i){return{p:p,i:i}}).sort(function(a,b){return b.p.score-a.p.score||a.i-b.i});
+  var top=ps.length&&ps[0].p.score>0?ps[0].p.score:-1;
+  return '<p class="eb">CANLI DURUM</p><div class="ph"><h2>Oyuncular <small>('+P.players.length+'/10)</small></h2>'+(live?'<span class="kt">Kalan tur: '+(P.total-P.round)+'</span>':'')+'</div>'+
+    ps.map(function(x,k){
+      var p=x.p,nr=live&&p.id===P.narr;
+      return '<div class="pl'+(nr?' nr':'')+'"><span class="rk">#'+(k+1)+'</span><span class="av'+(nr?' mc':'')+'">'+(nr?'🎤':ini(p.name))+'</span><span class="pi"><b>'+esc(p.name)+'</b>'+(p.id===me?'<span class="you">SEN</span>':'')+(p.score===top?' 👑':'')+'<small>'+(nr?'Anlatıcı · ':'')+stText(P,p)+'</small></span><b class="sc">'+p.score+'</b></div>';
+    }).join("");
+}
+function pnl(P){var e=$("pnl");if(e)e.innerHTML=panelInner(P)}
+function shell(P,h){return '<div class="gm"><div class="mn">'+h+'</div><aside class="card pn" id="pnl">'+panelInner(P)+'</aside></div>'}
+function sub(h){ui(shell(V.p,h))}
+function hl(id){document.querySelectorAll(".act").forEach(function(e){e.classList.remove("act")});var e=$(id);if(e)e.classList.add("act")}
+function cards(m){
+  return m.res.map(function(r,i){return '<div class="rc" id="r'+i+'"><span class="av">'+ini(r.name)+'</span><span class="ri"><b>'+esc(r.name)+'</b><small>Sırası bekleniyor…</small></span><span class="rs2"><em></em><b></b></span></div>'}).join("");
+}
+function revealCard(m,i){
+  var r=m.res[i],e=$("r"+i);if(!e)return;
+  e.querySelector("small").textContent="“"+r.guess+"”";
+  e.querySelector("em").textContent=r.ok?"✓ DOĞRU":"✗ YANLIŞ";
+  e.querySelector("b:last-child").textContent=r.ok?"+1 Puan":"0 Puan";
+  e.classList.add(r.ok?"yes":"no");
+}
+function setNp(s,b,k,n){
+  $("np").innerHTML='<div class="rh"><span class="pill '+(s.rv?'a':'y')+'">'+s.p+'</span><b class="tm">'+fmt(b.duration*1000)+'</b></div><div class="rt">'+esc(s.t)+'</div><div class="rs">'+esc(s.d)+' · '+(k+1)+'/'+n+'</div><div class="wf">'+wfHtml(b)+'</div><div style="margin-top:10px"><button class="b" data-a="rep">Tekrar Dinle</button><button class="g" data-a="skip">Atla</button></div>';
+}
+function room(m){
+  var tok=SR={again:false,done:false},steps=[],P=m.p,nn=nameOf(P,P.narr);
+  steps.push({id:"wc",raw:m.orig,rv:false,p:"▸ DÜZ BANT",t:nn+" — Gerçek Kayıt",d:"Anlatıcının söylediği orijinal ses"});
+  steps.push({id:"wc",raw:m.orig,rv:true,p:"◂ TERS BANT",t:nn+" — Tersten",d:"Oyuncuların duyduğu garip ses"});
+  m.res.forEach(function(r,i){
+    steps.push({id:"r"+i,raw:r.buf,rv:true,i:i,p:"◂ TERS BANT",t:r.name+" — Taklit, tersten",d:"Taklidin tersten hali: "+r.name+" bunu duyup tahminini yazdı"});
+  });
+  Promise.all(steps.map(function(s){return load(s.raw)})).then(async function(bufs){
+    for(var k=0;k<steps.length;k++){
+      if(SR!==tok||!$("np"))return;
+      var s=steps[k],b=s.rv?rev(bufs[k]):bufs[k],t0=performance.now();
+      hl(s.id);setNp(s,b,k,steps.length);
+      var iv=setInterval(function(){
+        var n=Math.floor(Math.min(1,(performance.now()-t0)/(b.duration*1000))*48);
+        document.querySelectorAll("#np .wf i").forEach(function(e,i){e.classList.toggle("on",i<n)});
+      },60);
+      await new Promise(function(res){play(b,res)});
+      clearInterval(iv);
+      if(SR!==tok||!$("np"))return;
+      if(tok.again){tok.again=false;k--;continue}
+      if(s.rv&&s.i!==undefined)revealCard(m,s.i);
+      await sleep(600);
+    }
+    if(SR!==tok||!$("np"))return;
+    tok.done=true;hl("");
+    $("np").innerHTML='<div class="rh"><span class="pill gr">BİTTİ</span></div><div class="rt">Gösterim bitti!</div><div class="rs">Herkesin kaydı dinlendi ve tahminler açıklandı.</div><div style="margin-top:10px"><button class="b" data-a="rpl">Baştan Dinle</button></div>';
+    var last=P.round>=P.total;
+    if(isHost){
+      var n=8;
+      (function c(){
+        if(SR!==tok||!$("cd"))return;
+        if(n<=0){A.next();return}
+        $("cd").textContent=(last?"Final":"Sonraki tur")+" "+n+" sn içinde…";n--;setTimeout(c,1000);
+      })();
+    }else if($("cd"))$("cd").textContent=last?"Final birazdan geliyor…":"Sonraki tur birazdan başlıyor…";
+  }).catch(function(){msg("Sesler çalınamadı.")});
+}
+function cmsg(m){
+  if(m.t==="err"){msg(m.m);return}
+  if(m.t==="prog"||m.t==="stat"){pnl(m.p);var e=$("prog");if(e&&m.n!==undefined)e.textContent=m.n;return}
+  stopAll();SR=null;V=m;msg();myRaw=myBuf=null;
+  var P=m.p,nn=esc(nameOf(P,P.narr)),hd='<p class="sub" style="margin:0 0 10px">Tur '+P.round+'/'+P.total+'</p>';
+  if(m.t==="lobby"){
+    ui(shell(P,'<div class="card"><p class="eb">ODA KODU</p><div class="code">'+esc(code)+'</div><p class="sub">Arkadaşların “Koda Katıl” sekmesinden bu kodla odaya girer.</p></div>'+
+      (isHost?'<button data-a="start">Oyunu Başlat</button><span class="sub"> En az 3 oyuncu gerekli.</span>':'<p class="sub">Kurucunun oyunu başlatması bekleniyor…</p>')));
+  }else if(m.t==="narr"){
+    if(P.narr===me){
+      ui(shell(P,hd+'<div class="card"><h2>Sen anlatıcısın</h2><label for="w">Gizli kelime</label><input id="w" placeholder="Gizli kelime veya cümle" autocomplete="off"><div id="rb"></div></div>'));
+      recUI($("rb"),{title:"Kelimeni söyle",hint:"Kaydet’e bas ve kelimeni net söyle",max:8,onState:function(s){tohost({t:"st",s:s})},confirm:{label:"Onayla ve Gönder",fn:function(raw){
+        var w=$("w").value;if(!norm(w)){msg("Önce kelimeyi yaz.");return}
+        tohost({t:"orig",word:w.trim(),buf:raw});
+      }}});
+    }else ui(shell(P,hd+'<div class="card"><h2>'+nn+' anlatıcı</h2><p>Gizli kelimesini kaydediyor. Hazır olunca ters sesi dinleyeceksin.</p></div>'));
+  }else if(m.t==="guess"){
+    if(P.narr===me)ui(shell(P,hd+'<div class="card"><h2>Tahminler bekleniyor</h2><p><span id="prog">0</span>/'+(P.players.length-1)+' oyuncu gönderdi.</p></div>'));
+    else{
+      load(m.buf).then(function(b){V.ob=b});
+      ui(shell(P,hd+'<div class="card"><h2>'+nn+' anlatıyor</h2><p class="sub" style="margin-top:0">1) Ters sesi dinle. 2) Duyduğunu taklit edip kaydet. 3) Taklidini tersten dinleyip kelimeyi tahmin et.</p><button class="b" data-a="p1">Ters sesi dinle</button><div id="rb"></div><label for="g">Tahminin</label><input id="g" placeholder="Kelimeyi yaz" autocomplete="off"><button data-a="sd2">Tahmini Gönder</button></div>'));
+      recUI($("rb"),{title:"Duyduğunu taklit et",hint:"Ters sesi dinle, duyduğun gibi söyle",max:8,extras:[{label:"Tersten Dinle",rev:true}],onReady:function(r,b){myRaw=r;myBuf=b},onState:function(s){tohost({t:"st",s:s})}});
+    }
+  }else if(m.t==="reveal"){
+    var ok=m.res.filter(function(r){return r.ok}).length;
+    ui(shell(P,hd+'<div class="top"><div class="card wc" id="wc"><p class="eb">KELİME AÇIKLANDI!</p><div class="wd">'+esc(m.word)+'</div><span class="chip">🎤 Anlatıcı <b>'+nn+'</b> ('+ok+'/'+m.res.length+' doğru): <b>+'+ok+' Puan</b></span></div><div class="card" id="np"><div class="rh"><span class="pill y">HAZIRLANIYOR</span></div><div class="rt">Sesler yükleniyor…</div></div></div><div class="rg" id="rg">'+cards(m)+'</div><div class="card"><p class="sub" id="cd" style="margin:0 0 6px"></p>'+(isHost?'<button data-a="next">'+(P.round<P.total?'Hemen Sonraki Tur':'Hemen Bitir')+'</button>':'')+'</div>'));
+    room(m);
+  }else if(m.t==="end"){
+    var mx=Math.max.apply(null,P.players.map(function(p){return p.score})),w=P.players.filter(function(p){return p.score===mx}).map(function(p){return esc(p.name)}).join(" ve ");
+    ui(shell(P,'<div class="card"><p class="eb">OYUN BİTTİ</p><div class="winner">🏆 '+w+'</div><p>'+mx+' puanla kazandı. Tüm puanlar sağdaki listede.</p>'+(isHost?'<button data-a="back">Odaya Dön</button>':'<p class="sub">Kurucunun yeni oyun başlatması bekleniyor…</p>')+'</div>'));
+  }
+}
+var A={
+  host:host,join:join,test:showTest,closeT:closeT,
+  tab:function(b){home(b.dataset.m)},
+  start:function(){
+    if(S.players.length<3){msg("En az 3 oyuncu gerekli.");return}
+    S.order=S.players.map(function(p){return p.id});S.idx=0;S.got={};S.st={};S.phase="narr";bc({t:"narr"});
+  },
+  p1:function(){if(V.ob)play(rev(V.ob))},
+  sd2:function(){
+    var g=$("g").value;
+    if(!myRaw){msg("Önce taklidini kaydet.");return}
+    if(!norm(g)){msg("Tahmin yaz.");return}
+    var raw=myRaw;
+    sub('<div class="card"><h2>Gönderildi</h2><p>Diğer oyuncular bekleniyor…</p></div>');
+    tohost({t:"guess",guess:g.trim(),buf:raw});
+  },
+  skip:function(){stopAll()},
+  rep:function(){if(SR&&!SR.done){SR.again=true;stopAll()}},
+  rpl:function(){stopAll();SR=null;var r=$("rg");if(r)r.innerHTML=cards(V);var c=$("cd");if(c)c.textContent="";room(V)},
+  next:function(){
+    if(S.phase!=="reveal")return;
+    S.idx++;S.got={};S.st={};
+    if(S.idx>=S.order.length){S.idx=S.order.length-1;S.phase="end";bc({t:"end"})}
+    else{S.phase="narr";bc({t:"narr"})}
+  },
+  back:function(){S.players.forEach(function(p){p.score=0});S.order=[];S.idx=0;S.st={};S.phase="lobby";bc({t:"lobby"})}
+};
+document.addEventListener("click",function(e){
+  var b=e.target.closest("[data-a]");if(!b||b.disabled)return;
+  var f=A[b.dataset.a];if(f)f(b);
+});
+var lc=0,lt=0;
+$("logo").addEventListener("click",function(){
+  var n=Date.now();if(n-lt>4000)lc=0;lt=n;
+  if(++lc>=10){lc=0;window.open("https://kick.com/pristagna","_blank","noopener")}
+});
+home("host");
+showTest();
+</script>
+</body>
+</html>
