@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ters Ses – Prototip</title>
+<style>
+:root{--bg:#f6f4ef;--card:#fff;--tx:#1d1b18;--mut:#6b665d;--ac:#d9480f;--ac2:#fff;--bd:#e2ded4;--ok:#2b8a3e;--bad:#c92a2a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171613;--card:#23211d;--tx:#f1eee6;--mut:#a39d90;--ac:#ff8c4a;--ac2:#1a1209;--bd:#3a362f;--ok:#69db7c;--bad:#ff8787;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#171613;--card:#23211d;--tx:#f1eee6;--mut:#a39d90;--ac:#ff8c4a;--ac2:#1a1209;--bd:#3a362f;--ok:#69db7c;--bad:#ff8787;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:520px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:1.4rem;margin:0 0 4px}
+p.s{color:var(--mut);margin:0 0 16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:12px}
+.card h2{font-size:1rem;margin:0 0 10px}
+.off{display:none}
+button{font:inherit;border:0;border-radius:10px;padding:10px 14px;margin:4px 6px 4px 0;background:var(--ac);color:var(--ac2);cursor:pointer;font-weight:600}
+button.g{background:transparent;color:var(--tx);border:1px solid var(--bd)}
+button.rec{background:var(--bad);color:#fff}
+input{font:inherit;width:100%;padding:10px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);margin-bottom:8px}
+.res{font-size:1.1rem;font-weight:700}
+.ok{color:var(--ok)}.bad{color:var(--bad)}
+#msg{color:var(--bad);min-height:1.4em}
+</style>
+</head>
+<body>
+<main>
+<h1>Ters Ses – Prototip</h1>
+<p class="s">Tek kişilik test modu: hem Anlatıcı hem Tahminci sensin.</p>
+<div id="msg"></div>
+
+<section class="card" id="s1">
+<h2>1. Anlatıcı: kelimeyi yaz ve kaydet</h2>
+<input id="word" placeholder="Gizli kelime (örn. abla)" autocomplete="off">
+<button id="r1">Kaydı başlat</button>
+</section>
+
+<section class="card off" id="s2">
+<h2>2. Tahminci: ters sesi dinle ve taklit et</h2>
+<button class="g" id="p1">Ters sesi dinle</button>
+<button id="r2">Taklidi kaydet</button>
+</section>
+
+<section class="card off" id="s3">
+<h2>3. Kendi taklidini tersten dinle ve tahmin et</h2>
+<button class="g" id="p2">Taklidin tersini dinle</button>
+<input id="guess" placeholder="Tahminin" autocomplete="off">
+<button id="go">Tahmini gönder</button>
+</section>
+
+<section class="card off" id="s4">
+<h2>Tur sonu</h2>
+<div class="res" id="res"></div>
+<p id="pts"></p>
+<button class="g" data-k="o">Orijinal</button>
+<button class="g" data-k="ro">Orijinalin tersi</button>
+<button class="g" data-k="i">Taklit</button>
+<button class="g" data-k="ri">Taklidin tersi</button>
+<div><button id="again">Yeni tur</button></div>
+</section>
+</main>
+<script>
+var ctx=null,mr=null,orig=null,imit=null,word="";
+function $(i){return document.getElementById(i)}
+function msg(t){$("msg").textContent=t||""}
+function ac(){if(!ctx)ctx=new(window.AudioContext||window.webkitAudioContext)();if(ctx.state==="suspended")ctx.resume();return ctx}
+function trim(b){
+  var d=b.getChannelData(0),th=0.02,s=0,e=d.length-1;
+  while(s<e&&Math.abs(d[s])<th)s++;
+  while(e>s&&Math.abs(d[e])<th)e--;
+  var pad=Math.floor(b.sampleRate*0.05);
+  s=Math.max(0,s-pad);e=Math.min(d.length-1,e+pad);
+  var n=e-s+1,o=ac().createBuffer(b.numberOfChannels,n,b.sampleRate);
+  for(var c=0;c<b.numberOfChannels;c++)o.getChannelData(c).set(b.getChannelData(c).subarray(s,e+1));
+  return o;
+}
+function rev(b){
+  var o=ac().createBuffer(b.numberOfChannels,b.length,b.sampleRate);
+  for(var c=0;c<b.numberOfChannels;c++){
+    var src=b.getChannelData(c),dst=o.getChannelData(c),n=src.length;
+    for(var i=0;i<n;i++)dst[i]=src[n-1-i];
+  }
+  return o;
+}
+function play(b){var s=ac().createBufferSource();s.buffer=b;s.connect(ac().destination);s.start()}
+async function toggleRec(btn,cb){
+  msg();
+  if(mr&&mr.state==="recording"){mr.stop();return}
+  var stream;
+  try{ac();stream=await navigator.mediaDevices.getUserMedia({audio:true})}
+  catch(e){msg("Mikrofon izni alınamadı. Tarayıcı ayarlarından izin verip tekrar dene.");return}
+  var chunks=[],label=btn.textContent;
+  mr=new MediaRecorder(stream);
+  mr.ondataavailable=function(e){chunks.push(e.data)};
+  mr.onstop=async function(){
+    stream.getTracks().forEach(function(t){t.stop()});
+    btn.textContent=label;btn.classList.remove("rec");
+    try{
+      var ab=await new Blob(chunks).arrayBuffer();
+      var buf=await ac().decodeAudioData(ab);
+      cb(trim(buf));
+    }catch(e){msg("Ses çözülemedi, tekrar dene.")}
+  };
+  mr.start();btn.textContent="Durdur";btn.classList.add("rec");
+}
+function show(id){["s1","s2","s3","s4"].forEach(function(x){$(x).classList.toggle("off",x!==id&&!(id==="s4"&&false))})}
+function norm(t){return t.trim().toLocaleLowerCase("tr")}
+
+$("r1").onclick=function(){
+  word=$("word").value;
+  if(!norm(word)){msg("Önce kelimeyi yaz.");return}
+  toggleRec($("r1"),function(b){orig=b;$("s2").classList.remove("off")});
+};
+$("p1").onclick=function(){if(orig)play(rev(orig))};
+$("r2").onclick=function(){
+  toggleRec($("r2"),function(b){imit=b;$("s3").classList.remove("off")});
+};
+$("p2").onclick=function(){if(imit)play(rev(imit))};
+$("go").onclick=function(){
+  var g=$("guess").value;
+  if(!norm(g)){msg("Tahmin yaz.");return}
+  var ok=norm(g)===norm(word);
+  $("res").innerHTML=ok?'<span class="ok">Bildin!</span> ':'<span class="bad">Bilemedin.</span> ';
+  $("res").innerHTML+="Kelime: <b></b> · Tahminin: <b></b>";
+  var bs=$("res").querySelectorAll("b");bs[0].textContent=word.trim();bs[1].textContent=g.trim();
+  $("pts").textContent=ok?"Tahminci +1 puan, Anlatıcı +1 puan (kelimeyi bilen kişi sayısı kadar).":"Kimse bilemedi: puan yok.";
+  $("s4").classList.remove("off");
+};
+document.querySelectorAll("[data-k]").forEach(function(b){
+  b.onclick=function(){
+    var k=b.dataset.k;
+    play(k==="o"?orig:k==="ro"?rev(orig):k==="i"?imit:rev(imit));
+  };
+});
+$("again").onclick=function(){
+  orig=imit=null;$("word").value="";$("guess").value="";msg();
+  ["s2","s3","s4"].forEach(function(x){$(x).classList.add("off")});
+};
+</script>
+</body>
+</html>
